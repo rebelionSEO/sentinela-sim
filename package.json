@@ -1,0 +1,45 @@
+{
+  "name": "sentinela-sim",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:single": "vite build --mode single",
+    "preview": "vite preview",
+    "test": "node scripts/smoke-test.mjs",
+    "check": "npm test && npm run build"
+  },
+  "dependencies": {
+    "framer-motion": "11.18.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.7.0",
+    "vite": "6.4.3",
+    "vite-plugin-singlefile": "2.3.3"
+  },
+  "description": "Simulación educativa e interactiva de un agente Sentinela que vigila un sistema multi-agente (ES/EN).",
+  "license": "MIT",
+  "author": "Gera Mejía (https://geramejia.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rebelionSEO/sentinela-sim"
+  },
+  "keywords": [
+    "ai-agents",
+    "multi-agent",
+    "observability",
+    "guardrails",
+    "human-in-the-loop",
+    "gtm",
+    "react",
+    "vite",
+    "education"
+  ],
+  "engines": {
+    "node": ">=18.18"
+  }
+}
