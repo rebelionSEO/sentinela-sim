@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0 — 2026-10-29
+
+- Modo incrustado: `?embed` muestra solo la cubierta, el selector de escenario, las fallas,
+  el incidente activo y 4 indicadores, con enlace a la versión completa. Pensado para un `<iframe>` en un blog.
+- El iframe puede ajustar su altura solo: la página avisa su alto con `postMessage` (`sentinela:height`).
+- `?embed&sc=gtm` abre directo en el escenario GTM.
+
 ## 1.0.0 — 2026-10-17
 
 Primera versión pública.

@@ -13,6 +13,10 @@ import { HowItWorks } from './components/HowItWorks.jsx';
 import { Quiz } from './components/Quiz.jsx';
 import { Compare } from './components/Compare.jsx';
 
+// Modo incrustado (?embed): solo la cubierta, para un <iframe> en un blog.
+const params = (() => { try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(); } })();
+const EMBED = params.has('embed');
+
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* sin almacenamiento */ } },
@@ -20,7 +24,7 @@ const store = {
 
 export default function App() {
   const [lang, setLangState] = useState(() => { const l = detectLang(store.get('sentinela-lang')); setLang(l); return l; });
-  const [scenario, setScenario] = useState(() => (store.get('sentinela-sc') === 'gtm' ? 'gtm' : 'content'));
+  const [scenario, setScenario] = useState(() => (EMBED ? (params.get('sc') === 'gtm' ? 'gtm' : 'content') : store.get('sentinela-sc') === 'gtm' ? 'gtm' : 'content'));
   const simRef = useRef(null);
   if (!simRef.current) simRef.current = createSim(scenario);
   const sourceRef = useRef(createScriptedSource());
@@ -32,13 +36,27 @@ export default function App() {
   const [game, setGame] = useState(false);
   const [sound, setSound] = useState(false);
   const [sel, setSel] = useState(null);
-  const [tourStep, setTourStep] = useState(() => (store.get('sentinela-tour-v3') ? null : 0));
+  const [tourStep, setTourStep] = useState(() => (EMBED || store.get('sentinela-tour-v3') ? null : 0));
   const R = useRef({});
   R.current = { playing, speed, auto, teach, game, sound };
   const reduce = useRef(typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches).current;
 
   setLang(lang);
-  useEffect(() => { try { document.documentElement.lang = lang; } catch { /* sin DOM */ } store.set('sentinela-lang', lang); }, [lang]);
+  useEffect(() => { try { document.documentElement.lang = lang; } catch { /* sin DOM */ } if (!EMBED) store.set('sentinela-lang', lang); }, [lang]);
+
+  // Incrustado: avisa al blog la altura real para que el iframe no tenga scroll interno.
+  useEffect(() => {
+    if (!EMBED || window.parent === window || typeof ResizeObserver === 'undefined') return;
+    let last = 0;
+    const send = () => {
+      const root = document.getElementById('root');
+      const h = Math.ceil(root ? root.getBoundingClientRect().height : document.documentElement.scrollHeight);
+      if (Math.abs(h - last) > 2) { last = h; window.parent.postMessage({ type: 'sentinela:height', height: h }, '*'); }
+    };
+    const ro = new ResizeObserver(send);
+    ro.observe(document.getElementById('root') || document.body); send();
+    return () => ro.disconnect();
+  }, []);
 
   // Bucle de animación: avanza el motor, reproduce sonidos y redibuja.
   useEffect(() => {
@@ -67,7 +85,7 @@ export default function App() {
   const switchScenario = (k) => {
     if (k === scenario) return;
     simRef.current = createSim(k, simRef.current);
-    setScenario(k); setSel(null); store.set('sentinela-sc', k);
+    setScenario(k); setSel(null); if (!EMBED) store.set('sentinela-sc', k);
   };
   const goStep = (i) => {
     setTourStep(i);
@@ -87,6 +105,46 @@ export default function App() {
   const select = (id) => { setSel((s) => (s === id ? null : id)); sim.sfx.push('click'); };
   const fault = (k) => triggerFault(sim, k);
   const onOff = (v) => (v ? T('on') : T('off'));
+
+  if (EMBED) {
+    const full = `${location.origin}/#${lang}`;
+    return (
+      <div className="wrap embed">
+        <header className="top">
+          <h1>{lang === 'es' ? <>{T('title1')} <span>{T('title2')}</span></> : <><span>{T('title1')}</span> {T('title2')}</>}</h1>
+          <div className="lang" role="group" aria-label="Language">
+            {['es', 'en'].map((l) => (
+              <button key={l} className={'btn' + (lang === l ? ' on' : '')} aria-pressed={lang === l} onClick={() => setLangState(l)}>{l.toUpperCase()}</button>
+            ))}
+            <a className="btn link full" href={full} target="_blank" rel="noopener">{T('fullVersion')}</a>
+          </div>
+        </header>
+        <div className="scenarios" role="tablist">
+          {[['content', 'scContent', 'scContentHint'], ['gtm', 'scGtm', 'scGtmHint']].map(([k, l, h]) => (
+            <button key={k} role="tab" aria-selected={scenario === k} className={'sc-btn' + (scenario === k ? ' on' : '')} onClick={() => switchScenario(k)}>
+              <b>{T(l)}</b><small>{T(h)}</small>
+            </button>
+          ))}
+        </div>
+        <div className={'deck' + (sim.hold ? ' held' : '')}>
+          <Deck sim={sim} t={t} sel={sel} onSelect={select} onPing={(id) => pingAgent(sim, id)} onFault={fault} reduce={reduce} focus={null} />
+        </div>
+        <div className="faults">
+          <span className="lbl-s">{T('inject')}</span>
+          {faultList.map((k) => (
+            <button key={k} className="btn fault" disabled={!!sim.active[k] || !sim.booted} onClick={() => fault(k)}>{tx(FAULTS[k].label)}</button>
+          ))}
+        </div>
+        <IncidentPanel sim={sim} hl={null} game={false} onDecide={(c) => decide(sim, c)} />
+        <div className="kpis">
+          <div className="kpi"><b>{healthy}/{agents.length}</b><small>{T('healthy')}</small></div>
+          <div className="kpi"><b>{sim.stats.detected}</b><small>{T('detected')}</small></div>
+          <div className="kpi"><b>{sim.stats.blocked}</b><small>{T('blocked')}</small></div>
+          <div className="kpi"><b>{sim.stats.escalations}</b><small>{T('escalations')}</small></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wrap">

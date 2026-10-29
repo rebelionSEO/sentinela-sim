@@ -89,6 +89,8 @@ const UI = {
   fatigueMsg: B('El humano está saturado: ya aprueba sin leer, incluso lo crítico.', 'The human is overloaded: approving without reading, even critical cases.'),
   bounce: B('Rebotes', 'Bounces'), vipWait: B('Lead enterprise esperando dueño', 'Enterprise lead waiting for an owner'),
   compare: B('Sencilla vs compleja', 'Simple vs complex'),
+  fullVersion: B('Versión completa ↗', 'Full version ↗'),
+  embedHint: B('Toca un agente o provoca una falla.', 'Tap an agent or trigger a failure.'),
   compareHint: B('Mismo Sentinela, distinta escala. Lo que cambia es cuánto se puede romper.', 'Same Sentinel, different scale. What changes is how much can break.'),
   cAgents: B('Agentes', 'Agents'), cZones: B('Zonas', 'Zones'), cSentinels: B('Sentinelas', 'Sentinels'),
   cPath: B('Handoffs de punta a punta', 'End-to-end handoffs'), cWatched: B('Métricas que vigila', 'Metrics watched'),

@@ -303,3 +303,24 @@ header.top { align-items: flex-start; }
 .cb i { display: block; height: 100%; border-radius: 4px; }
 .cmp-cell b { font: 500 14px var(--f-mono); text-align: right; font-variant-numeric: tabular-nums; }
 .cmp-lessons { margin: 14px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; display: flex; flex-direction: column; gap: 6px; max-width: 80ch; }
+
+/* Modo incrustado (?embed): compacto para un iframe en un blog */
+.wrap.embed { padding-block: 12px; gap: 10px; }
+.embed header.top { align-items: center; gap: 10px; }
+.embed h1 { font-size: 20px; }
+.embed .lang { flex-wrap: wrap; align-items: center; }
+.embed .btn.full { font-family: var(--f-body); }
+.embed .sc-btn { padding: 8px 12px; }
+.embed .sc-btn b { font-size: 14px; }
+.embed .faults { gap: 6px; }
+.embed .faults .btn { padding: 5px 9px; font-size: 12px; }
+.embed .kpi { min-width: 0; flex: 1 1 90px; padding: 4px 10px; }
+.embed .kpi b { font-size: 16px; }
+@media (max-width: 560px) {
+  .embed .scenarios { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .embed .sc-btn small { display: none; }
+  .embed .faults { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+  .embed .faults .btn, .embed .faults .lbl-s { flex: 0 0 auto; white-space: nowrap; }
+  .embed .kpi { flex-basis: 0; padding: 4px 6px; }
+  .embed .kpi small { font-size: 9px; letter-spacing: .04em; display: block; line-height: 1.25; }
+}
