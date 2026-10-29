@@ -47,6 +47,25 @@ npm run dev            # http://localhost:5199
 - **WordPress**: `npm run build:single`, sube `dist/index.html` a una carpeta del hosting y, si quieres, incrústalo con un `<iframe>`.
 - La política `frame-ancestors` solo permite incrustarlo en `geramejia.com`. Si lo usas en otro dominio, edita esa línea.
 
+### Incrustarlo en un blog
+
+`?embed` da una versión compacta (cubierta, escenarios, fallas, incidente y enlace a la versión completa).
+Agrega `#en` o `#es` para el idioma y `&sc=gtm` para abrir en GTM. En WordPress, un bloque HTML personalizado:
+
+```html
+<iframe id="sentinela" src="https://sentinel.geramejia.com/?embed#es"
+        style="width:100%;height:760px;border:0;border-radius:12px;display:block"
+        loading="lazy" title="Agente Sentinela"></iframe>
+<script>
+addEventListener('message', function (e) {
+  if (e.origin !== 'https://sentinel.geramejia.com') return;
+  if (e.data && e.data.type === 'sentinela:height') document.getElementById('sentinela').style.height = e.data.height + 'px';
+});
+</script>
+```
+
+El script es opcional: ajusta la altura del iframe para que no tenga scroll interno.
+
 ## Estructura
 
 ```
